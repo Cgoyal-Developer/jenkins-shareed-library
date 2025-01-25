@@ -1,9 +1,9 @@
 def call(imageName, VULN_FILE) {
     try {
-        // Run the Trivy scan for vulnerabilities and save output to a file in JSON format
+        // Run the Trivy scan for vulnerabilities and save output to a file in human-readable table format
         echo "Running Trivy scan for image ${imageName}"
         def result = sh(script: """
-            trivy image --format json --severity HIGH,CRITICAL --exit-code 0 --no-progress ${imageName} > ${VULN_FILE}
+            trivy image --format table --severity HIGH,CRITICAL --exit-code 0 --no-progress ${imageName} > ${VULN_FILE}
         """, returnStatus: true)
 
         // Check if vulnerabilities were found based on the exit code
