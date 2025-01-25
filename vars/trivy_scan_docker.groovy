@@ -1,21 +1,21 @@
-def call(FS_VULN_FILE) {
+def call(imageName, VULN_FILE) {
     try {
-        // Run the Trivy filesystem scan and save output to a file
-        echo "Running Trivy filesystem scan"
+        // Run the Trivy scan for vulnerabilities and save output to a file in JSON format
+        echo "Running Trivy scan for image ${imageName}"
         def result = sh(script: """
-            trivy fs --format table --severity HIGH,CRITICAL --exit-code 0 --no-progress . > ${FS_VULN_FILE}
+            trivy image --format json --severity HIGH,CRITICAL --exit-code 0 --no-progress ${imageName} > ${VULN_FILE}
         """, returnStatus: true)
-        
-        // If vulnerabilities are found (exit code 0, but vulnerabilities exist), log to a file
+
+        // Check if vulnerabilities were found based on the exit code
         if (result == 0) {
-            echo "Filesystem vulnerabilities found, report saved to ${FS_VULN_FILE}"
+            echo "Vulnerabilities found, report saved to ${VULN_FILE}"
             return true // Return true indicating vulnerabilities were found
         } else {
-            echo "No high or critical filesystem vulnerabilities found."
+            echo "No high or critical vulnerabilities found."
             return false // Return false indicating no vulnerabilities
         }
     } catch (Exception e) {
-        echo "Error during filesystem scan: ${e.getMessage()}"
+        echo "Error during Trivy scan: ${e.getMessage()}"
         return true // Assume vulnerabilities found if an error occurs
     }
 }
